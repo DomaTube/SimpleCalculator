@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Calculator - Adam</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .calculator {
+      background-color: #444;
+      border: 2px solid #333;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      width: 320px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .output {
+      font-size: 2em;
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #666;
+      border-radius: 5px;
+      background-color: #555;
+      color: #fff;
+      text-align: right;
+      height: 60px;
+      line-height: 60px;
+      overflow: hidden;
+    }
+
+    .name {
+      font-size: 1.2em;
+      color: #ccc;
+      margin-bottom: 10px;
+    }
+
+    .history {
+      font-size: 0.8em;
+      text-align: left;
+      color: #aaa;
+      max-height: 100px;
+      overflow-y: auto;
+      padding: 5px;
+      background-color: #333;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+
+    .history-item {
+      margin-bottom: 5px;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .top-buttons {
+      grid-column: span 4;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 20px;
+      font-size: 1.5em;
+      border: none;
+      cursor: pointer;
+      background-color: #777;
+      color: #fff;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #999;
+    }
+
+    button.operator {
+      background-color: #f2a154;
+    }
+
+    button.operator:hover {
+      background-color: #e08e4b;
+    }
+
+    button.clear {
+      background-color: #eb4d4b;
+    }
+
+    button.clear:hover {
+      background-color: #c53d3a;
+    }
+
+    button.equal {
+      background-color: #48c774;
+      grid-column: span 2;
+    }
+
+    button.equal:hover {
+      background-color: #3aae5f;
+    }
+
+    button.square-root {
+      background-color: #3498db;
+    }
+
+    button.square-root:hover {
+      background-color: #2980b9;
+    }
+
+    button.clear-history {
+      background-color: #333;
+      color: #fff;
+      grid-column: span 4;
+      margin-top: 10px;
+    }
+
+    button.clear-history:hover {
+      background-color: #555;
+    }
+  </style>
+</head>
+<body>
+
+<div class="calculator">
+  <div class="name">Simple Calculator - Adam</div>
+  <div class="history" id="history"></div>
+  <div class="output" id="output">0</div>
+  <div class="top-buttons">
+    <button class="operator clear" onclick="clearEntry()">CE</button>
+    <button class="operator clear" onclick="clearOutput()">C</button>
+    <button class="operator" onclick="toggleSquareRoot()">√</button>
+    <button class="operator" onclick="appendToOutput('/')">&divide;</button>
+  </div>
+  <div class="buttons">
+    <button onclick="appendToOutput('7')">7</button>
+    <button onclick="appendToOutput('8')">8</button>
+    <button onclick="appendToOutput('9')">9</button>
+    <button class="operator" onclick="appendToOutput('+')">+</button>
+    <button onclick="appendToOutput('4')">4</button>
+    <button onclick="appendToOutput('5')">5</button>
+    <button onclick="appendToOutput('6')">6</button>
+    <button class="operator" onclick="appendToOutput('-')">-</button>
+    <button onclick="appendToOutput('1')">1</button>
+    <button onclick="appendToOutput('2')">2</button>
+    <button onclick="appendToOutput('3')">3</button>
+    <button class="operator" onclick="appendToOutput('*')">&times;</button>
+    <button onclick="appendToOutput('0')">0</button>
+    <button onclick="appendToOutput('.')">.</button>
+    <button class="equal" onclick="calculate()">=</button>
+  </div>
+  <button class="clear-history" onclick="clearHistory()">Clear History</button>
+</div>
+
+<script>
+  let history = [];
+
+  function appendToOutput(value) {
+    let output = document.getElementById('output');
+    if (output.textContent === '0' && value !== '.') {
+      output.textContent = value;
+    } else {
+      output.textContent += value;
+    }
+  }
+
+  function clearOutput() {
+    document.getElementById('output').textContent = '0';
+  }
+
+  function clearEntry() {
+    let output = document.getElementById('output');
+    output.textContent = output.textContent.slice(0, -1);
+    if (output.textContent === '') {
+      output.textContent = '0';
+    }
+  }
+
+  function calculate() {
+    let output = document.getElementById('output');
+    let result;
+    try {
+      result = eval(output.textContent); // Evaluates the expression
+      output.textContent = result;
+      addToHistory(output.textContent);
+    } catch (e) {
+      output.textContent = 'Error';
+    }
+  }
+
+  function toggleSquareRoot() {
+    let output = document.getElementById('output');
+    let number = parseFloat(output.textContent);
+    if (number >= 0) {
+      output.textContent = Math.sqrt(number);
+      addToHistory(`√(${number}) = ${output.textContent}`);
+    } else {
+      output.textContent = 'Error';
+    }
+  }
+
+  function addToHistory(entry) {
+    history.push(entry);
+    updateHistoryDisplay();
+  }
+
+  function updateHistoryDisplay() {
+    let historyElement = document.getElementById('history');
+    historyElement.innerHTML = '';
+    history.forEach((entry, index) => {
+      let historyItem = document.createElement('div');
+      historyItem.classList.add('history-item');
+      historyItem.textContent = `${index + 1}. ${entry}`;
+      historyElement.appendChild(historyItem);
+    });
+  }
+
+  function clearHistory() {
+    history = [];
+    updateHistoryDisplay();
+  }
+</script>
+
+</body>
+</html>
